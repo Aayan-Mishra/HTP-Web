@@ -97,7 +97,7 @@ export default function CreatePrescriptionDialog({
           medications: medications.filter(m => m.name),
           follow_up_date: formData.follow_up_date || null,
           status: "pending",
-        }]);
+        }] as any);
 
       if (error) throw error;
 

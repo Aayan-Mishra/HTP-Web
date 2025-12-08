@@ -71,7 +71,7 @@ export default function AddPatientDialog({ open, onClose, onAdded, doctors }: Ad
           current_medications: formData.current_medications || null,
           assigned_doctor_id: formData.assigned_doctor_id || null,
           status: "active",
-        }])
+        }] as any)
         .select()
         .single();
 
