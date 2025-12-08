@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Plus } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import type { Database } from "@/lib/supabase/supabaseTypes";
 
 interface CustomerProfile {
   id: string;
@@ -87,23 +88,27 @@ export default function AddDoctorDialog({ open, onClose, onAdded }: AddDoctorDia
       const customer = customers.find(c => c.id === selectedCustomer);
       if (!customer) throw new Error("Customer not found");
 
+      type DoctorInsert = Database['public']['Tables']['doctors']['Insert'];
+      
+      const doctorData: DoctorInsert = {
+        clerk_user_id: customer.clerk_user_id,
+        email: customer.email,
+        full_name: customer.full_name,
+        phone: customer.phone || null,
+        specialization: formData.specialization || null,
+        license_number: formData.license_number || null,
+        qualification: formData.qualification || null,
+        years_of_experience: formData.years_of_experience ? parseInt(formData.years_of_experience) : null,
+        clinic_address: formData.clinic_address || null,
+        consultation_fee: formData.consultation_fee ? parseFloat(formData.consultation_fee) : null,
+        consultation_hours: formData.consultation_hours || null,
+        available_days: formData.available_days.length > 0 ? formData.available_days : [],
+        status: "active",
+      };
+
       const { error } = await supabase
         .from("doctors")
-        .insert([{
-          clerk_user_id: customer.clerk_user_id,
-          email: customer.email,
-          full_name: customer.full_name,
-          phone: customer.phone || null,
-          specialization: formData.specialization || null,
-          license_number: formData.license_number || null,
-          qualification: formData.qualification || null,
-          years_of_experience: formData.years_of_experience ? parseInt(formData.years_of_experience) : null,
-          clinic_address: formData.clinic_address || null,
-          consultation_fee: formData.consultation_fee ? parseFloat(formData.consultation_fee) : null,
-          consultation_hours: formData.consultation_hours || null,
-          available_days: formData.available_days.length > 0 ? formData.available_days : null,
-          status: "active",
-        }]);
+        .insert([doctorData]);
 
       if (error) throw error;
 
