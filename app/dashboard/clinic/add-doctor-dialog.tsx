@@ -88,9 +88,7 @@ export default function AddDoctorDialog({ open, onClose, onAdded }: AddDoctorDia
       const customer = customers.find(c => c.id === selectedCustomer);
       if (!customer) throw new Error("Customer not found");
 
-      type DoctorInsert = Database['public']['Tables']['doctors']['Insert'];
-      
-      const doctorData: DoctorInsert = {
+      const doctorData = {
         clerk_user_id: customer.clerk_user_id,
         email: customer.email,
         full_name: customer.full_name,
@@ -108,7 +106,7 @@ export default function AddDoctorDialog({ open, onClose, onAdded }: AddDoctorDia
 
       const { error } = await supabase
         .from("doctors")
-        .insert([doctorData]);
+        .insert([doctorData] as any);
 
       if (error) throw error;
 
