@@ -56,7 +56,7 @@ export default function AddDoctorDialog({ open, onClose, onAdded }: AddDoctorDia
       .from("doctors")
       .select("clerk_user_id");
 
-    const doctorClerkIds = existingDoctors?.map(d => d.clerk_user_id) || [];
+    const doctorClerkIds = (existingDoctors as Array<{ clerk_user_id: string }> | null)?.map(d => d.clerk_user_id) || [];
 
     const { data, error } = await supabase
       .from("customer_profiles")
