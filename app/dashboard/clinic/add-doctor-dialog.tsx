@@ -64,7 +64,7 @@ export default function AddDoctorDialog({ open, onClose, onAdded }: AddDoctorDia
       .order("full_name");
 
     if (!error && data) {
-      const availableCustomers = data.filter(c => !doctorClerkIds.includes(c.clerk_user_id));
+      const availableCustomers = (data as CustomerProfile[]).filter(c => !doctorClerkIds.includes(c.clerk_user_id));
       setCustomers(availableCustomers);
     }
   };
