@@ -79,7 +79,7 @@ export default function AddPatientDialog({ open, onClose, onAdded, doctors }: Ad
 
       toast({
         title: "Success",
-        description: `Patient ${formData.full_name} added with code ${data.patient_code}`,
+        description: `Patient ${formData.full_name} added with code ${(data as any)?.patient_code}`,
       });
 
       onAdded();
