@@ -101,7 +101,7 @@ export default function ProductsTable({ products, onUpdate }: ProductsTableProps
 
       const updateData: any = { current_stock: Math.max(0, newStock) };
       
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from("products")
         .update(updateData)
         .eq("id", selectedProduct.id);
