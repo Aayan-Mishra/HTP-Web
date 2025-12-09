@@ -13,7 +13,7 @@ export default async function DoctorDashboardPage() {
   const supabase = await createClient();
 
   // Check if user is a doctor
-  const { data: doctor } = await supabase
+  const { data: doctor } = await (supabase as any)
     .from("doctors")
     .select("*")
     .eq("clerk_user_id", user.id)
@@ -24,7 +24,7 @@ export default async function DoctorDashboardPage() {
   }
 
   // Get doctor's patients with latest prescription info
-  const { data: patients } = await supabase
+  const { data: patients } = await (supabase as any)
     .from("patients")
     .select(`
       *,

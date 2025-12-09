@@ -65,10 +65,10 @@ export default async function DashboardPage() {
     { count: activeMemberships },
     { data: expiringBatches },
   ] = await Promise.all([
-    supabase.from("order_requests").select("*", { count: "exact", head: true }).eq("status", "pending"),
-    supabase.from("low_stock_view").select("*", { count: "exact", head: true }),
-    supabase.from("memberships").select("*", { count: "exact", head: true }).eq("status", "active"),
-    supabase.from("expiry_alerts").select("*").limit(5),
+    (supabase as any).from("order_requests").select("*", { count: "exact", head: true }).eq("status", "pending"),
+    (supabase as any).from("low_stock_view").select("*", { count: "exact", head: true }),
+    (supabase as any).from("memberships").select("*", { count: "exact", head: true }).eq("status", "active"),
+    (supabase as any).from("expiry_alerts").select("*").limit(5),
   ]);
 
   return (

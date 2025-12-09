@@ -27,7 +27,7 @@ export default async function ProfilePage() {
   let orders: any[] = [];
 
   if (primaryEmail) {
-    const { data: existingProfile } = await supabase
+    const { data: existingProfile } = await (supabase as any)
       .from("customer_profiles")
       .select("*, memberships(*)")
       .eq("clerk_user_id", userId)
@@ -37,7 +37,7 @@ export default async function ProfilePage() {
 
     // Get linked membership if exists
     if (profile?.membership_id) {
-      const { data: membershipData } = await supabase
+      const { data: membershipData } = await (supabase as any)
         .from("memberships")
         .select("*")
         .eq("id", profile.membership_id)
@@ -47,7 +47,7 @@ export default async function ProfilePage() {
     }
 
     // Get user's orders
-    const { data: ordersData } = await supabase
+    const { data: ordersData } = await (supabase as any)
       .from("order_requests")
       .select("*")
       .eq("customer_profile_id", profile?.id)

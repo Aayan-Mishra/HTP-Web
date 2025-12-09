@@ -27,7 +27,7 @@ export default async function EditProfilePage() {
   let profile = null;
 
   if (primaryEmail) {
-    const { data } = await supabase
+    const { data } = await (supabase as any)
       .from("customer_profiles")
       .select("*")
       .eq("clerk_user_id", userId)

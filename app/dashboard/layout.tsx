@@ -29,7 +29,7 @@ export default async function DashboardLayout({
 
   // Check if user is a doctor
   const supabase = await createClient();
-  const { data: doctorProfile } = await supabase
+  const { data: doctorProfile } = await (supabase as any)
     .from("doctors")
     .select("id")
     .eq("clerk_user_id", userId)

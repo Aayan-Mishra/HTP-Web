@@ -18,13 +18,13 @@ export default async function MembershipsPage() {
   const supabase = await createClient();
 
   // Fetch all membership tiers
-  const { data: tiers } = await supabase
+  const { data: tiers } = await (supabase as any)
     .from("membership_tiers")
     .select("*")
     .order("points_threshold");
 
   // Fetch all memberships with customer info
-  const { data: memberships } = await supabase
+  const { data: memberships } = await (supabase as any)
     .from("customer_memberships")
     .select(`
       *,
@@ -34,7 +34,7 @@ export default async function MembershipsPage() {
     .order("created_at", { ascending: false });
 
   // Fetch recent transactions
-  const { data: transactions } = await supabase
+  const { data: transactions } = await (supabase as any)
     .from("membership_transactions")
     .select(`
       *,

@@ -18,13 +18,13 @@ export default async function ClinicPage() {
   const supabase = await createClient();
 
   // Fetch all doctors
-  const { data: doctors } = await supabase
+  const { data: doctors } = await (supabase as any)
     .from("doctors")
     .select("*")
     .order("full_name");
 
   // Fetch all patients with doctor info
-  const { data: patients } = await supabase
+  const { data: patients } = await (supabase as any)
     .from("patients")
     .select(`
       *,
@@ -33,7 +33,7 @@ export default async function ClinicPage() {
     .order("created_at", { ascending: false });
 
   // Fetch recent prescriptions
-  const { data: prescriptions } = await supabase
+  const { data: prescriptions } = await (supabase as any)
     .from("prescriptions")
     .select(`
       *,

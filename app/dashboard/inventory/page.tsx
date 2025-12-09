@@ -14,18 +14,18 @@ export default async function InventoryPage() {
   const supabase = await createClient();
 
   // Get all products
-  const { data: products } = await supabase
+  const { data: products } = await (supabase as any)
     .from("products")
     .select("*")
     .order("name");
 
   // Get low stock products
-  const { data: lowStockProducts } = await supabase
+  const { data: lowStockProducts } = await (supabase as any)
     .from("low_stock_products")
     .select("*");
 
   // Get expiring products
-  const { data: expiringProducts } = await supabase
+  const { data: expiringProducts } = await (supabase as any)
     .from("expiring_products")
     .select("*");
 
