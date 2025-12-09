@@ -99,9 +99,11 @@ export default function ProductsTable({ products, onUpdate }: ProductsTableProps
         newStock = quantityNum; // ADJUSTMENT sets to exact value
       }
 
-      const { error: updateError } = await (supabase
+      const updateData: any = { current_stock: Math.max(0, newStock) };
+      
+      const { error: updateError } = await supabase
         .from("products")
-        .update({ current_stock: Math.max(0, newStock) } as any) as any)
+        .update(updateData)
         .eq("id", selectedProduct.id);
 
       if (updateError) throw updateError;

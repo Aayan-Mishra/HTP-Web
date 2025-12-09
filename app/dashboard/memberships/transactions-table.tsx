@@ -81,9 +81,11 @@ export default function TransactionsTable({ transactions, memberships }: Transac
           ? membership.points_balance + pointsNum
           : membership.points_balance - pointsNum;
 
-      const { error: updateError } = await (supabase
+      const updateData: any = { points_balance: newBalance };
+
+      const { error: updateError } = await supabase
         .from("customer_memberships")
-        .update({ points_balance: newBalance } as any) as any)
+        .update(updateData)
         .eq("id", formData.membership_id);
 
       if (updateError) throw updateError;
