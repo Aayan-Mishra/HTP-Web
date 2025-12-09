@@ -48,6 +48,10 @@ export default function InventoryClient({
 
   const totalProducts = products.length;
   const totalStock = products.reduce((sum, p) => sum + (p.current_stock || 0), 0);
+
+  const handleRefresh = () => {
+    window.location.reload();
+  };
   const lowStockCount = lowStockProducts.length;
   const expiringCount = expiringProducts.length;
 
@@ -168,7 +172,7 @@ export default function InventoryClient({
               </div>
             </CardHeader>
             <CardContent>
-              <ProductsTable products={filteredProducts} onUpdate={setProducts} />
+              <ProductsTable products={filteredProducts} onUpdate={handleRefresh} />
             </CardContent>
           </Card>
         </TabsContent>
