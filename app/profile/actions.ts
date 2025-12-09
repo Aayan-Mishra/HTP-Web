@@ -28,7 +28,7 @@ export async function createOrUpdateProfile(formData: FormData) {
   const supabase = await createClient();
 
   // Check if profile exists
-  const { data: existingProfile } = await supabase
+  const { data: existingProfile } = await (supabase as any)
     .from("customer_profiles")
     .select("*")
     .eq("clerk_user_id", userId)
@@ -86,7 +86,7 @@ export async function linkMembership(membershipNumber: string) {
   }
 
   // Find membership by number
-  const { data: membership, error: membershipError } = await supabase
+  const { data: membership, error: membershipError } = await (supabase as any)
     .from("memberships")
     .select("*")
     .eq("membership_number", membershipNumber.toUpperCase())

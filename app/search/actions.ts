@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function searchMedicines(searchTerm: string) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.rpc("search_medicines", {
+  const { data, error } = await (supabase as any).rpc("search_medicines", {
     search_term: searchTerm,
   });
 

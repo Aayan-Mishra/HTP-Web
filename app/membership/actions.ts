@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function lookupMembership(phone: string) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from("memberships")
     .select("*")
     .eq("customer_phone", phone)
@@ -28,13 +28,15 @@ export async function renewMembership(membershipId: string) {
   const newEndDate = new Date();
   newEndDate.setFullYear(newEndDate.getFullYear() + 1);
 
-  const { data, error } = await supabase
+  const updateData: any = {
+    status: "active",
+    start_date: new Date().toISOString().split("T")[0],
+    end_date: newEndDate.toISOString().split("T")[0],
+  };
+
+  const { data, error } = await (supabase as any)
     .from("memberships")
-    .update({
-      status: "active",
-      start_date: new Date().toISOString().split("T")[0],
-      end_date: newEndDate.toISOString().split("T")[0],
-    })
+    .update(updateData)
     .eq("id", membershipId)
     .select()
     .single();
