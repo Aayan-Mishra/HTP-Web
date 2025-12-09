@@ -111,9 +111,9 @@ export default function MembershipsTable({ memberships }: MembershipsTableProps)
           ? selectedMembership.points_balance + pointsNum
           : selectedMembership.points_balance - pointsNum;
 
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase
         .from("customer_memberships")
-        .update({ points_balance: newBalance } as any)
+        .update({ points_balance: newBalance } as any) as any)
         .eq("id", selectedMembership.id);
 
       if (updateError) throw updateError;
