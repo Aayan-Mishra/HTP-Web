@@ -101,7 +101,7 @@ export default function MembershipsTable({ memberships }: MembershipsTableProps)
           transaction_type: transactionType,
           points: pointsNum,
           description: description || null,
-        }]);
+        }] as any);
 
       if (txError) throw txError;
 
@@ -113,7 +113,7 @@ export default function MembershipsTable({ memberships }: MembershipsTableProps)
 
       const { error: updateError } = await supabase
         .from("customer_memberships")
-        .update({ points_balance: newBalance })
+        .update({ points_balance: newBalance } as any)
         .eq("id", selectedMembership.id);
 
       if (updateError) throw updateError;

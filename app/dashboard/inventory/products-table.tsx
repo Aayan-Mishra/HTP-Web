@@ -85,7 +85,7 @@ export default function ProductsTable({ products, onUpdate }: ProductsTableProps
           movement_type: adjustmentType,
           quantity: quantityNum,
           notes: notes || null,
-        }]);
+        }] as any);
 
       if (movementError) throw movementError;
 
@@ -101,7 +101,7 @@ export default function ProductsTable({ products, onUpdate }: ProductsTableProps
 
       const { error: updateError } = await supabase
         .from("products")
-        .update({ current_stock: Math.max(0, newStock) })
+        .update({ current_stock: Math.max(0, newStock) } as any)
         .eq("id", selectedProduct.id);
 
       if (updateError) throw updateError;

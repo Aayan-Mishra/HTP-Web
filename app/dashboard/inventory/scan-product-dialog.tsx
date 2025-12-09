@@ -219,7 +219,7 @@ export default function ScanProductDialog({ open, onClose, onProductAdded }: Sca
           reorder_level: parseInt(formData.reorder_level) || 20,
           ocr_text: ocrText || null,
           scanned_image_url: image || null,
-        }])
+        }] as any)
         .select()
         .single();
 
@@ -227,7 +227,7 @@ export default function ScanProductDialog({ open, onClose, onProductAdded }: Sca
 
       toast({
         title: "Success",
-        description: `Product "${formData.name}" added successfully with code ${data.product_code}`,
+        description: `Product "${formData.name}" added successfully with code ${(data as any)?.product_code}`,
       });
 
       onProductAdded(data);

@@ -71,7 +71,7 @@ export default function TransactionsTable({ transactions, memberships }: Transac
           transaction_type: formData.transaction_type,
           points: pointsNum,
           description: formData.description || null,
-        }]);
+        }] as any);
 
       if (txError) throw txError;
 
@@ -83,7 +83,7 @@ export default function TransactionsTable({ transactions, memberships }: Transac
 
       const { error: updateError } = await supabase
         .from("customer_memberships")
-        .update({ points_balance: newBalance })
+        .update({ points_balance: newBalance } as any)
         .eq("id", formData.membership_id);
 
       if (updateError) throw updateError;

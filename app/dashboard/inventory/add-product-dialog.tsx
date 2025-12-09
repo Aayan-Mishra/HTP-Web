@@ -64,7 +64,7 @@ export default function AddProductDialog({ open, onClose, onProductAdded }: AddP
           current_stock: parseInt(formData.current_stock) || 0,
           minimum_stock: parseInt(formData.minimum_stock) || 10,
           reorder_level: parseInt(formData.reorder_level) || 20,
-        }])
+        }] as any)
         .select()
         .single();
 
@@ -72,7 +72,7 @@ export default function AddProductDialog({ open, onClose, onProductAdded }: AddP
 
       toast({
         title: "Success",
-        description: `Product "${formData.name}" added successfully with code ${data.product_code}`,
+        description: `Product "${formData.name}" added successfully with code ${(data as any)?.product_code}`,
       });
 
       onProductAdded(data);

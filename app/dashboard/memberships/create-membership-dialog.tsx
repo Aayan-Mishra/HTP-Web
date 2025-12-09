@@ -97,7 +97,7 @@ export default function CreateMembershipDialog({ open, onClose, onMembershipCrea
           membership_code: membershipCode,
           points_balance: parseInt(formData.initial_points) || 0,
           status: "active",
-        }])
+        }] as any)
         .select()
         .single();
 
@@ -108,11 +108,11 @@ export default function CreateMembershipDialog({ open, onClose, onMembershipCrea
         await supabase
           .from("membership_transactions")
           .insert([{
-            membership_id: membership.id,
+            membership_id: (membership as any)?.id,
             transaction_type: "EARNED",
             points: parseInt(formData.initial_points),
             description: "Initial points",
-          }]);
+          }] as any);
       }
 
       toast({
