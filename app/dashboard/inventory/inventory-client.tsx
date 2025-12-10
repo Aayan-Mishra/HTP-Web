@@ -13,10 +13,12 @@ import {
   AlertTriangle, 
   Clock,
   Search,
-  BarChart
+  BarChart,
+  Upload
 } from "lucide-react";
 import ScanProductDialog from "./scan-product-dialog";
 import AddProductDialog from "./add-product-dialog";
+import { ImportCsvDialog } from "./import-csv-dialog";
 import ProductsTable from "./products-table";
 import StockAlerts from "./stock-alerts";
 
@@ -35,6 +37,7 @@ export default function InventoryClient({
   const [searchQuery, setSearchQuery] = useState("");
   const [showScanDialog, setShowScanDialog] = useState(false);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showImportDialog, setShowImportDialog] = useState(false);
 
   const filteredProducts = products.filter((product) => {
     const query = searchQuery.toLowerCase();
@@ -72,6 +75,13 @@ export default function InventoryClient({
             </p>
           </div>
           <div className="flex gap-3">
+            <Button
+              onClick={() => setShowImportDialog(true)}
+              variant="outline"
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              Import CSV
+            </Button>
             <Button
               onClick={() => setShowScanDialog(true)}
               className="bg-teal-600 hover:bg-teal-700"
@@ -196,6 +206,12 @@ export default function InventoryClient({
         open={showAddDialog}
         onClose={() => setShowAddDialog(false)}
         onProductAdded={handleProductAdded}
+      />
+
+      <ImportCsvDialog
+        open={showImportDialog}
+        onOpenChange={setShowImportDialog}
+        onSuccess={handleRefresh}
       />
     </div>
   );
