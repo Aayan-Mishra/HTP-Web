@@ -5,11 +5,12 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Trophy, Users, TrendingUp, Plus, Search } from "lucide-react";
+import { Trophy, Users, TrendingUp, Plus, Search, Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import CreateMembershipDialog from "./create-membership-dialog";
 import MembershipsTable from "./memberships-table";
 import TransactionsTable from "./transactions-table";
+import ImportCSVDialog from "./import-csv-dialog";
 
 interface MembershipsClientProps {
   tiers: any[];
@@ -20,6 +21,7 @@ interface MembershipsClientProps {
 export default function MembershipsClient({ tiers, memberships, transactions }: MembershipsClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
 
   const stats = {
     totalMembers: memberships.length,
@@ -48,13 +50,22 @@ export default function MembershipsClient({ tiers, memberships, transactions }: 
           <h1 className="text-3xl font-bold text-gray-900">Membership Management</h1>
           <p className="text-gray-500 mt-1">Manage customer memberships and loyalty points</p>
         </div>
-        <Button
-          onClick={() => setCreateDialogOpen(true)}
-          className="bg-teal-600 hover:bg-teal-700"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Create Membership
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setImportDialogOpen(true)}
+            variant="outline"
+          >
+            <Upload className="mr-2 h-4 w-4" />
+            Import CSV
+          </Button>
+          <Button
+            onClick={() => setCreateDialogOpen(true)}
+            className="bg-teal-600 hover:bg-teal-700"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Create Membership
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -154,6 +165,13 @@ export default function MembershipsClient({ tiers, memberships, transactions }: 
         open={createDialogOpen}
         onClose={() => setCreateDialogOpen(false)}
         onMembershipCreated={handleMembershipCreated}
+        tiers={tiers}
+      />
+
+      <ImportCSVDialog
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        onImported={handleMembershipCreated}
         tiers={tiers}
       />
     </div>

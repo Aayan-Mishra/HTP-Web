@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Trophy, Plus, Minus, Loader2, User } from "lucide-react";
+import { Trophy, Plus, Minus, Loader2, User, Edit, Trash2, AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -38,11 +38,14 @@ interface MembershipsTableProps {
 
 export default function MembershipsTable({ memberships }: MembershipsTableProps) {
   const [pointsDialogOpen, setPointsDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedMembership, setSelectedMembership] = useState<Membership | null>(null);
   const [transactionType, setTransactionType] = useState<"EARNED" | "REDEEMED">("EARNED");
   const [points, setPoints] = useState("");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editStatus, setEditStatus] = useState("");
 
   const { toast } = useToast();
   const supabase = createClient();
@@ -68,6 +71,81 @@ export default function MembershipsTable({ memberships }: MembershipsTableProps)
     setPoints("");
     setDescription("");
     setPointsDialogOpen(true);
+  };
+
+  const handleEditMembership = (membership: Membership) => {
+    setSelectedMembership(membership);
+    setEditStatus(membership.status);
+    setEditDialogOpen(true);
+  };
+
+  const handleDeleteMembership = (membership: Membership) => {
+    setSelectedMembership(membership);
+    setDeleteDialogOpen(true);
+  };
+
+  const submitEdit = async () => {
+    if (!selectedMembership) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const updateData: any = { status: editStatus };
+
+      const { error } = await (supabase as any)
+        .from("customer_memberships")
+        .update(updateData)
+        .eq("id", selectedMembership.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Membership updated successfully",
+      });
+
+      setEditDialogOpen(false);
+      window.location.reload();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update membership",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const submitDelete = async () => {
+    if (!selectedMembership) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await (supabase as any)
+        .from("customer_memberships")
+        .delete()
+        .eq("id", selectedMembership.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Membership deleted successfully",
+      });
+
+      setDeleteDialogOpen(false);
+      window.location.reload();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete membership",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const submitPointsAdjustment = async () => {
@@ -202,7 +280,7 @@ export default function MembershipsTable({ memberships }: MembershipsTableProps)
                         size="sm"
                         variant="ghost"
                         onClick={() => handleAdjustPoints(membership, "EARNED")}
-                        title="Add Purchase"
+                        title="Add Points"
                       >
                         <Plus className="h-4 w-4" />
                       </Button>
@@ -213,6 +291,23 @@ export default function MembershipsTable({ memberships }: MembershipsTableProps)
                         title="Redeem Points"
                       >
                         <Minus className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleEditMembership(membership)}
+                        title="Edit Membership"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDeleteMembership(membership)}
+                        title="Delete Membership"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
                   </TableCell>
@@ -294,6 +389,103 @@ export default function MembershipsTable({ memberships }: MembershipsTableProps)
                 )}
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Membership Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Membership</DialogTitle>
+            <DialogDescription>
+              {selectedMembership && (
+                <>
+                  {selectedMembership.membership_code} - {selectedMembership.customer_profiles.full_name}
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <Label>Status</Label>
+              <Select value={editStatus} onValueChange={setEditStatus}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                  <SelectItem value="suspended">Suspended</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={submitEdit}
+                disabled={isSubmitting}
+                className="bg-teal-600 hover:bg-teal-700"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Changes"
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <AlertTriangle className="h-5 w-5" />
+              Delete Membership
+            </DialogTitle>
+            <DialogDescription>
+              {selectedMembership && (
+                <>
+                  Are you sure you want to delete membership <strong>{selectedMembership.membership_code}</strong> for{" "}
+                  <strong>{selectedMembership.customer_profiles.full_name}</strong>?
+                  <br /><br />
+                  This action cannot be undone and will remove all associated transaction history.
+                </>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={submitDelete}
+              disabled={isSubmitting}
+              variant="destructive"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Membership
+                </>
+              )}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
