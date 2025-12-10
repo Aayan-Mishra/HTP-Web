@@ -22,6 +22,7 @@ interface Product {
   strength: string | null;
   form: string | null;
   current_stock: number;
+  total_boxes: number | null;
   minimum_stock: number;
   reorder_level: number;
   unit_price: number | null;
