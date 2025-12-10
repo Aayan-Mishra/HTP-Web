@@ -11,7 +11,8 @@ export const ADMIN_USER_IDS = [
   // Example: 'user_2abc123xyz',
   
   // Your admin accounts:
-  'user_36WUYYKdHBYeu5aIqfz6ljPbJWB', // Staff Member
+  'user_36WUYYKdHBYeu5aIqfz6ljPbJWB',
+  'user_36dLN2Vy4RNAbOzLUVnkU5hvwb1', // Staff Member
 ];
 
 /**
