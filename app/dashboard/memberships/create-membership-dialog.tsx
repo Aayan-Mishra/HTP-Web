@@ -21,10 +21,16 @@ export default function CreateMembershipDialog({ open, onClose, onMembershipCrea
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [customers, setCustomers] = useState<any[]>([]);
   const [membershipCode, setMembershipCode] = useState("");
+  const [isNewCustomer, setIsNewCustomer] = useState(false);
   const [formData, setFormData] = useState({
     customer_id: "",
     tier_id: "",
     initial_points: "0",
+  });
+  const [newCustomerData, setNewCustomerData] = useState({
+    full_name: "",
+    email: "",
+    phone: "",
   });
 
   const { toast } = useToast();
@@ -59,10 +65,28 @@ export default function CreateMembershipDialog({ open, onClose, onMembershipCrea
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.customer_id || !formData.tier_id) {
+    if (!formData.tier_id) {
       toast({
         title: "Validation Error",
-        description: "Please select a customer and tier",
+        description: "Please select a tier",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!isNewCustomer && !formData.customer_id) {
+      toast({
+        title: "Validation Error",
+        description: "Please select a customer",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (isNewCustomer && (!newCustomerData.full_name || !newCustomerData.email)) {
+      toast({
+        title: "Validation Error",
+        description: "Please enter customer name and email",
         variant: "destructive",
       });
       return;
@@ -71,11 +95,29 @@ export default function CreateMembershipDialog({ open, onClose, onMembershipCrea
     setIsSubmitting(true);
 
     try {
+      let customerId = formData.customer_id;
+
+      // Create new customer if needed
+      if (isNewCustomer) {
+        const { data: newCustomer, error: customerError } = await (supabase as any)
+          .from("customer_profiles")
+          .insert([{
+            full_name: newCustomerData.full_name,
+            email: newCustomerData.email,
+            phone: newCustomerData.phone || null,
+          }])
+          .select()
+          .single();
+
+        if (customerError) throw customerError;
+        customerId = newCustomer.id;
+      }
+
       // Check if customer already has a membership
       const { data: existing } = await supabase
         .from("customer_memberships")
         .select("id")
-        .eq("customer_id", formData.customer_id)
+        .eq("customer_id", customerId)
         .single();
 
       if (existing) {
@@ -92,7 +134,7 @@ export default function CreateMembershipDialog({ open, onClose, onMembershipCrea
       const { data: membership, error } = await supabase
         .from("customer_memberships")
         .insert([{
-          customer_id: formData.customer_id,
+          customer_id: customerId,
           tier_id: formData.tier_id,
           membership_code: membershipCode,
           points_balance: parseInt(formData.initial_points) || 0,
@@ -139,6 +181,12 @@ export default function CreateMembershipDialog({ open, onClose, onMembershipCrea
       tier_id: "",
       initial_points: "0",
     });
+    setNewCustomerData({
+      full_name: "",
+      email: "",
+      phone: "",
+    });
+    setIsNewCustomer(false);
     generateMembershipCode();
     onClose();
   };
@@ -179,13 +227,24 @@ export default function CreateMembershipDialog({ open, onClose, onMembershipCrea
           <div>
             <Label>Customer *</Label>
             <Select
-              value={formData.customer_id}
-              onValueChange={(value) => setFormData({ ...formData, customer_id: value })}
+              value={isNewCustomer ? "new_customer" : formData.customer_id}
+              onValueChange={(value) => {
+                if (value === "new_customer") {
+                  setIsNewCustomer(true);
+                  setFormData({ ...formData, customer_id: "" });
+                } else {
+                  setIsNewCustomer(false);
+                  setFormData({ ...formData, customer_id: value });
+                }
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select customer" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="new_customer">
+                  <span className="font-medium text-teal-600">➕ Create New Customer</span>
+                </SelectItem>
                 {customers.map((customer) => (
                   <SelectItem key={customer.id} value={customer.id}>
                     {customer.full_name} ({customer.email})
@@ -194,6 +253,39 @@ export default function CreateMembershipDialog({ open, onClose, onMembershipCrea
               </SelectContent>
             </Select>
           </div>
+
+          {/* New Customer Form */}
+          {isNewCustomer && (
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 space-y-3">
+              <p className="text-sm font-medium text-gray-700">New Customer Details</p>
+              <div>
+                <Label>Full Name *</Label>
+                <Input
+                  value={newCustomerData.full_name}
+                  onChange={(e) => setNewCustomerData({ ...newCustomerData, full_name: e.target.value })}
+                  placeholder="Enter customer name"
+                />
+              </div>
+              <div>
+                <Label>Email *</Label>
+                <Input
+                  type="email"
+                  value={newCustomerData.email}
+                  onChange={(e) => setNewCustomerData({ ...newCustomerData, email: e.target.value })}
+                  placeholder="customer@example.com"
+                />
+              </div>
+              <div>
+                <Label>Phone (Optional)</Label>
+                <Input
+                  type="tel"
+                  value={newCustomerData.phone}
+                  onChange={(e) => setNewCustomerData({ ...newCustomerData, phone: e.target.value })}
+                  placeholder="+1234567890"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Tier Selection */}
           <div>
