@@ -146,15 +146,20 @@ export default function CreateMembershipDialog({ open, onClose, onMembershipCrea
       if (error) throw error;
 
       // Create initial transaction if points were added
-      if (parseInt(formData.initial_points) > 0) {
-        await supabase
+      if (parseInt(formData.initial_points) > 0 && membership?.id) {
+        const { error: txError } = await (supabase as any)
           .from("membership_transactions")
           .insert([{
-            membership_id: (membership as any)?.id,
+            membership_id: membership.id,
             transaction_type: "EARNED",
             points: parseInt(formData.initial_points),
             description: "Initial points",
-          }] as any);
+          }]);
+
+        if (txError) {
+          console.error("Failed to create initial transaction:", txError);
+          // Don't throw - membership was created successfully
+        }
       }
 
       toast({

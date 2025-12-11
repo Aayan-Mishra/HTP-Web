@@ -172,14 +172,14 @@ export default function MembershipsTable({ memberships }: MembershipsTableProps)
 
     try {
       // Create transaction
-      const { error: txError } = await supabase
+      const { error: txError } = await (supabase as any)
         .from("membership_transactions")
         .insert([{
           membership_id: selectedMembership.id,
           transaction_type: transactionType,
           points: pointsNum,
           description: description || null,
-        }] as any);
+        }]);
 
       if (txError) throw txError;
 
