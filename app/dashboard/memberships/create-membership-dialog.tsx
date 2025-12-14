@@ -131,7 +131,7 @@ export default function CreateMembershipDialog({ open, onClose, onMembershipCrea
       }
 
       // Create membership
-      const { data: membership, error } = await supabase
+      const { data: membership, error } = await (supabase as any)
         .from("customer_memberships")
         .insert([{
           customer_id: customerId,
@@ -139,7 +139,7 @@ export default function CreateMembershipDialog({ open, onClose, onMembershipCrea
           membership_code: membershipCode,
           points_balance: parseInt(formData.initial_points) || 0,
           status: "active",
-        }] as any)
+        }])
         .select()
         .single();
 
